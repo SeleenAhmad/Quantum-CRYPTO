@@ -120,10 +120,56 @@ It demonstrates:
 
 ---
 
+## Training and Evaluation of Models for Fraud Profit Prediction
+
+Dataset:
+- File: 'quantum_vs_classical_fraud_cleaned.csv'
+- Contains transaction-level features:
+    - transaction_value_usd
+    - latency_ms
+    - security_level_score
+- Target variable: expected_profit_usd
+
+Data Preprocessing:
+1. Clip transaction_value_usd and latency_ms to minimum 1 to avoid log(0)
+2. Apply log-transform to transaction_value_usd and latency_ms:
+    - log_transaction_value = log(1 + transaction_value_usd)
+    - log_latency = log(1 + latency_ms)
+3. Select features for modeling:
+    - X = ['log_transaction_value', 'log_latency', 'security_level_score']
+    - Y = expected_profit_usd
+
+Model Training:
+1. Split dataset into training and testing sets (80% train, 20% test)
+2. Train a Linear Regression model:
+    - Evaluate using R², MAE, and RMSE
+3. Train a Random Forest Regressor:
+    - Perform GridSearchCV for hyperparameter tuning:
+        - n_estimators: [100, 200]
+        - max_depth: [None, 10, 20]
+        - min_samples_split: [2, 5]
+        - min_samples_leaf: [1, 2]
+    - Select best estimator based on R²
+    - Evaluate using R², MAE, and RMSE
+4. Train an XGBoost Regressor:
+    - n_estimators=500, max_depth=5, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8
+    - Evaluate using R², MAE, and RMSE
+
+Outputs:
+- Linear Regression: R², RMSE, MAE, coefficients per feature
+- Random Forest: R², RMSE, MAE, feature importances
+- XGBoost: R², RMSE, MAE
+
+Notes:
+- Random Forest is robust for the dataset size (~7,500 rows) and shows the best performance
+- XGBoost can be tried for further experimentation, but may require tuning to outperform RF
+- No extreme feature engineering is applied to avoid overfitting
+"""
+
+
 ##  Future Work
 
 * Time-series extension (adoption trends)
-* Regression models for profit and fraud prediction
 * Causal inference on Quantum adoption
 * Cost–benefit simulation scenarios
 
