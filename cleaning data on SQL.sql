@@ -16,7 +16,7 @@ LOAD DATA LOCAL INFILE 'C:/Users/DELL/Downloads/quantum_vs_classical_fraud_datas
 INTO TABLE fraud_data
 FIELDS TERMINATED BY ',' 
 -- Removed ENCLOSED BY because your CSV doesn't use quotes
-LINES TERMINATED BY '\n' -- Changed from \r\n to \n based on the file content
+LINES TERMINATED BY '\n' 
 IGNORE 1 LINES;
 
 -- Check the count immediately
