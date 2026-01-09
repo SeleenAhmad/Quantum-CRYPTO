@@ -15,11 +15,11 @@ CREATE TABLE fraud_data (
 LOAD DATA LOCAL INFILE 'C:/Users/DELL/Downloads/quantum_vs_classical_fraud_dataset.csv'
 INTO TABLE fraud_data
 FIELDS TERMINATED BY ',' 
--- Removed ENCLOSED BY because your CSV doesn't use quotes
+
 LINES TERMINATED BY '\n' 
 IGNORE 1 LINES;
 
--- Check the count immediately
+-- Check the count 
 SELECT COUNT(*) AS total_rows FROM fraud_data;
 select * from fraud_data
 DROP TABLE IF EXISTS fraud_data_copy;
@@ -119,7 +119,7 @@ GROUP BY transaction_id,
          expected_profit_usd,
          latency_ms
 HAVING duplicate_count > 1;
--- Step 1: Compute median and store in variable
+-- Compute median and store in variable
 SET @median := (
     WITH ranked AS (
         SELECT transaction_value_usd,
@@ -183,7 +183,7 @@ UPDATE fraud_data_copy
 SET latency_ms = @median
 WHERE latency_ms IS NULL;
 
--- Step 2: Update NULLs with the median
+--  Update NULLs with the median
 UPDATE fraud_data_copy
 SET transaction_value_usd = @median
 WHERE transaction_value_usd IS NULL;
