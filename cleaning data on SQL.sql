@@ -232,3 +232,35 @@ FROM
     fraud_data_copy;
 
 
+ALTER TABLE fraud_data_copy
+ADD COLUMN transaction_value_usd_z DOUBLE,
+ADD COLUMN security_level_score_z DOUBLE,
+ADD COLUMN expected_profit_usd_z DOUBLE,
+ADD COLUMN latency_ms_z DOUBLE;
+
+UPDATE fraud_data_copy f
+JOIN (
+    SELECT 
+        AVG(transaction_value_usd) AS mean_trans,
+        STDDEV_SAMP(transaction_value_usd) AS std_trans,
+        
+        AVG(security_level_score) AS mean_sec,
+        STDDEV_SAMP(security_level_score) AS std_sec,
+        
+        AVG(expected_profit_usd) AS mean_profit,
+        STDDEV_SAMP(expected_profit_usd) AS std_profit,
+        
+        AVG(latency_ms) AS mean_latency,
+        STDDEV_SAMP(latency_ms) AS std_latency
+    FROM fraud_data_copy
+) stats
+SET 
+    f.transaction_value_usd_z = (f.transaction_value_usd - stats.mean_trans) / stats.std_trans,
+    f.security_level_score_z = (f.security_level_score - stats.mean_sec) / stats.std_sec,
+    f.expected_profit_usd_z = (f.expected_profit_usd - stats.mean_profit) / stats.std_profit,
+    f.latency_ms_z = (f.latency_ms - stats.mean_latency) / stats.std_latency;
+
+SELECT 
+    *
+FROM
+    fraud_data_copy;
